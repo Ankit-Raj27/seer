@@ -31,6 +31,18 @@ export function loadConfig(): Config {
   }
 
   const rawConfig = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+
+  // Allow environment variables to override or fill in API keys
+  if (!rawConfig.apiKey) {
+    if (rawConfig.provider === 'gemini') {
+      rawConfig.apiKey = process.env.GEMINI_API_KEY;
+    } else if (rawConfig.provider === 'openai') {
+      rawConfig.apiKey = process.env.OPENAI_API_KEY;
+    } else if (rawConfig.provider === 'anthropic') {
+      rawConfig.apiKey = process.env.ANTHROPIC_API_KEY;
+    }
+  }
+
   const result = ConfigSchema.safeParse(rawConfig);
 
   if (!result.success) {

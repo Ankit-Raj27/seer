@@ -1,26 +1,33 @@
 import { OpenAIProvider } from '../llm/openai.js';
+import { GeminiProvider } from '../llm/gemini.js';
 import { Conversation } from '../session/conversation.js';
 import { StreamRenderer } from '../ui/streamRenderer.js';
 import { type Config } from '../config/loadConfig.js';
+import { type LLMProvider } from '../llm/provider.js';
 import readline from 'readline';
 import chalk from 'chalk';
 import ora from 'ora';
 
 export async function chatCommand(message: string | undefined, config: Config) {
-  const provider = new OpenAIProvider(config.apiKey, config.model, config.baseUrl);
+  let provider: LLMProvider;
+  
+  if (config.provider === 'gemini') {
+    provider = new GeminiProvider(config.apiKey, config.model, config.baseUrl);
+  } else {
+    provider = new OpenAIProvider(config.apiKey, config.model, config.baseUrl);
+  }
+
   const conversation = new Conversation('You are Seer, a helpful AI CLI agent.');
   const renderer = new StreamRenderer();
 
   if (message) {
-    // Single message mode
     await executeChat(message, provider, conversation, renderer);
   } else {
-    // Interactive mode
     await startInteractive(provider, conversation, renderer);
   }
 }
 
-async function executeChat(content: string, provider: OpenAIProvider, conversation: Conversation, renderer: StreamRenderer) {
+async function executeChat(content: string, provider: LLMProvider, conversation: Conversation, renderer: StreamRenderer) {
   conversation.addMessage('user', content);
   renderer.renderHeader('assistant');
 
@@ -44,7 +51,7 @@ async function executeChat(content: string, provider: OpenAIProvider, conversati
   }
 }
 
-async function startInteractive(provider: OpenAIProvider, conversation: Conversation, renderer: StreamRenderer) {
+async function startInteractive(provider: LLMProvider, conversation: Conversation, renderer: StreamRenderer) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,

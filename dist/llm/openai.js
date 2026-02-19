@@ -23,7 +23,7 @@ export class OpenAIProvider {
         });
         if (!response.ok) {
             const error = await response.text();
-            throw new Error(`OpenAI API Error: ${error}`);
+            throw new Error(`OpenAI API Error: ${response.status} - ${error}`);
         }
         const body = response.body;
         if (!body)

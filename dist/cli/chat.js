@@ -1,19 +1,24 @@
 import { OpenAIProvider } from '../llm/openai.js';
+import { GeminiProvider } from '../llm/gemini.js';
 import { Conversation } from '../session/conversation.js';
 import { StreamRenderer } from '../ui/streamRenderer.js';
 import readline from 'readline';
 import chalk from 'chalk';
 import ora from 'ora';
 export async function chatCommand(message, config) {
-    const provider = new OpenAIProvider(config.apiKey, config.model, config.baseUrl);
+    let provider;
+    if (config.provider === 'gemini') {
+        provider = new GeminiProvider(config.apiKey, config.model, config.baseUrl);
+    }
+    else {
+        provider = new OpenAIProvider(config.apiKey, config.model, config.baseUrl);
+    }
     const conversation = new Conversation('You are Seer, a helpful AI CLI agent.');
     const renderer = new StreamRenderer();
     if (message) {
-        // Single message mode
         await executeChat(message, provider, conversation, renderer);
     }
     else {
-        // Interactive mode
         await startInteractive(provider, conversation, renderer);
     }
 }
