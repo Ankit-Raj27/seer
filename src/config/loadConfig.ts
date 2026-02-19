@@ -22,9 +22,9 @@ export function loadConfig(): Config {
 
   if (!fs.existsSync(CONFIG_FILE)) {
     const defaultConfig: Config = {
-      provider: 'openai',
-      model: 'gpt-4o-mini',
-      apiKey: '',
+      provider: 'gemini',
+      model: 'gemini-2.5-flash',
+      apiKey: process.env.GEMINI_API_KEY || '',
     };
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfig, null, 2));
     throw new Error(`Config file created at ${CONFIG_FILE}. Please add your API key.`);
